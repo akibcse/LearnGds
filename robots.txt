@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://learngds.netlify.app/sitemap.xml
