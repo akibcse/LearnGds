@@ -389,6 +389,489 @@
       .fb{grid-column:1}
       .hstats{gap:20px}
     }
+
+    /* AEROPLANE TAKEOFF TRANSITION & COUNTDOWN WIDGET */
+    #flight-pill {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      z-index: 150;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(17, 19, 24, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(26, 86, 219, 0.3);
+      padding: 10px 16px;
+      border-radius: 100px;
+      color: #fff;
+      font-family: var(--fb);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateY(0);
+      max-width: calc(100vw - 48px);
+    }
+    #flight-pill.hidden {
+      transform: translateY(100px);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .flight-pill-radar {
+      position: relative;
+      width: 32px;
+      height: 32px;
+      background: rgba(26, 86, 219, 0.25);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .flight-pill-radar::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 50%;
+      border: 2px solid rgba(56, 189, 248, 0.6);
+      animation: radarPing 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+    @keyframes radarPing {
+      0% { transform: scale(0.8); opacity: 1; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+    .flight-pill-icon {
+      font-size: 16px;
+      transform: rotate(45deg);
+      display: inline-block;
+      animation: planeFloat 2s ease-in-out infinite alternate;
+    }
+    @keyframes planeFloat {
+      0% { transform: rotate(45deg) translateY(0); }
+      100% { transform: rotate(45deg) translateY(-3px); }
+    }
+    .flight-pill-text {
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.92);
+      white-space: nowrap;
+    }
+    .flight-pill-text strong {
+      color: #38bdf8;
+      font-weight: 700;
+    }
+    .flight-pill-btn {
+      background: linear-gradient(135deg, #1a56db, #0284c7);
+      color: #fff;
+      border: none;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 100px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+      box-shadow: 0 2px 10px rgba(26, 86, 219, 0.4);
+      font-family: var(--fb);
+    }
+    .flight-pill-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 14px rgba(26, 86, 219, 0.6);
+      background: linear-gradient(135deg, #2563eb, #0ea5e9);
+    }
+    .flight-pill-close {
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 16px;
+      cursor: pointer;
+      padding: 4px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      transition: color 0.2s;
+      line-height: 1;
+    }
+    .flight-pill-close:hover {
+      color: #fff;
+    }
+    .flight-pill-progress {
+      position: absolute;
+      bottom: 0;
+      left: 18px;
+      right: 18px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .flight-pill-bar {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #1a56db, #38bdf8);
+      transform-origin: left;
+      animation: countdownProgress 15s linear forwards;
+    }
+    @keyframes countdownProgress {
+      0% { transform: scaleX(1); }
+      100% { transform: scaleX(0); }
+    }
+
+    /* Fullscreen Flight Transition Overlay */
+    #flight-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: radial-gradient(circle at 60% 40%, #0c1c38 0%, #070d19 60%, #030712 100%);
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #flight-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+      visibility: visible;
+    }
+
+    /* Speed warp streaks */
+    .flight-warp-lines {
+      position: absolute;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse at 75% 25%, rgba(56, 189, 248, 0.18) 0%, transparent 60%),
+        repeating-linear-gradient(55deg, transparent 0, transparent 38px, rgba(255, 255, 255, 0.05) 38px, rgba(255, 255, 255, 0.05) 40px);
+      opacity: 0;
+      transform: scale(1.2);
+    }
+    #flight-overlay.active .flight-warp-lines {
+      opacity: 1;
+      animation: warpMotion 0.6s linear infinite;
+    }
+    @keyframes warpMotion {
+      0% { transform: scale(1) translate(-20px, 20px); }
+      100% { transform: scale(1.1) translate(20px, -20px); }
+    }
+
+    /* Passing Cloud layers */
+    .flight-cloud {
+      position: absolute;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 70%);
+      border-radius: 50%;
+      filter: blur(30px);
+      pointer-events: none;
+    }
+    .flight-cloud-1 {
+      width: 480px;
+      height: 280px;
+      top: 10%;
+      right: -200px;
+      opacity: 0;
+    }
+    .flight-cloud-2 {
+      width: 650px;
+      height: 380px;
+      bottom: -100px;
+      left: -200px;
+      opacity: 0;
+    }
+    #flight-overlay.active .flight-cloud-1 {
+      animation: cloudDrift1 2.8s ease-in-out forwards;
+    }
+    #flight-overlay.active .flight-cloud-2 {
+      animation: cloudDrift2 2.8s ease-in-out forwards;
+    }
+    @keyframes cloudDrift1 {
+      0% { transform: translate(100px, -50px) scale(0.8); opacity: 0; }
+      30% { opacity: 0.6; }
+      100% { transform: translate(-350px, 180px) scale(1.5); opacity: 0; }
+    }
+    @keyframes cloudDrift2 {
+      0% { transform: translate(-100px, 50px) scale(0.8); opacity: 0; }
+      30% { opacity: 0.5; }
+      100% { transform: translate(300px, -180px) scale(1.6); opacity: 0; }
+    }
+
+    /* Sonic Shockwave Ring */
+    .flight-shockwave {
+      position: absolute;
+      top: 45%;
+      left: 45%;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid rgba(56, 189, 248, 0.85);
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.7);
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 0;
+      pointer-events: none;
+    }
+    #flight-overlay.active .flight-shockwave {
+      animation: shockwaveExpand 1.6s cubic-bezier(0.1, 0.8, 0.3, 1) 0.8s forwards;
+    }
+    @keyframes shockwaveExpand {
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+      50% { opacity: 0.8; }
+      100% { transform: translate(-50%, -50%) scale(40); opacity: 0; }
+    }
+
+    /* Aeroplane Motion Stage */
+    .flight-scene {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .flight-airplane-wrapper {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 220px;
+      height: 220px;
+      transform: translate3d(-300px, 120vh, 0) rotate(32deg) scale(0.65);
+      transform-origin: center center;
+      filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.6));
+    }
+    #flight-overlay.active .flight-airplane-wrapper {
+      animation: airplaneTakeoff 2.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes airplaneTakeoff {
+      0% {
+        transform: translate3d(-20vw, 110vh, 0) rotate(24deg) scale(0.55);
+        opacity: 0;
+      }
+      15% {
+        opacity: 1;
+      }
+      45% {
+        transform: translate3d(36vw, 42vh, 0) rotate(38deg) scale(1.1);
+      }
+      75% {
+        transform: translate3d(68vw, 16vh, 0) rotate(44deg) scale(1.45);
+      }
+      100% {
+        transform: translate3d(125vw, -35vh, 0) rotate(50deg) scale(2.3);
+        opacity: 1;
+      }
+    }
+
+    /* Contrail Trails */
+    .flight-contrail {
+      position: absolute;
+      height: 5px;
+      background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 20%, rgba(56, 189, 248, 0.7) 80%, rgba(255, 255, 255, 0.95) 100%);
+      border-radius: 4px;
+      filter: blur(1.5px);
+      transform-origin: right center;
+    }
+    .flight-contrail-left {
+      top: 60%;
+      right: 68%;
+      width: 200px;
+      transform: rotate(-142deg) translateY(4px);
+      animation: contrailFlicker 0.15s infinite alternate;
+    }
+    .flight-contrail-right {
+      top: 72%;
+      right: 56%;
+      width: 200px;
+      transform: rotate(-142deg) translateY(-4px);
+      animation: contrailFlicker 0.15s infinite alternate 0.08s;
+    }
+    @keyframes contrailFlicker {
+      0% { opacity: 0.75; transform: rotate(-142deg) scaleY(0.9); }
+      100% { opacity: 1; transform: rotate(-142deg) scaleY(1.3); }
+    }
+
+    /* Jet Engine Glow */
+    .jet-thrust {
+      position: absolute;
+      width: 14px;
+      height: 26px;
+      background: radial-gradient(ellipse at top, #ffffff 0%, #38bdf8 45%, #2563eb 80%, transparent 100%);
+      border-radius: 50%;
+      filter: drop-shadow(0 0 10px #38bdf8) drop-shadow(0 0 20px #0284c7);
+      animation: thrustPulse 0.12s infinite alternate;
+    }
+    .thrust-l { top: 60%; left: 30%; transform: rotate(128deg); }
+    .thrust-r { top: 74%; left: 44%; transform: rotate(128deg); }
+    @keyframes thrustPulse {
+      0% { transform: rotate(128deg) scale(0.9); opacity: 0.85; }
+      100% { transform: rotate(128deg) scale(1.25); opacity: 1; }
+    }
+
+    /* Wing strobe lights */
+    .strobe-red {
+      position: absolute;
+      top: 59%;
+      left: 7%;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 12px #ef4444, 0 0 20px #ef4444;
+      animation: strobeBlink 0.8s infinite steps(1);
+    }
+    .strobe-green {
+      position: absolute;
+      top: 59%;
+      right: 7%;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 12px #22c55e, 0 0 20px #22c55e;
+      animation: strobeBlink 0.8s infinite steps(1) 0.4s;
+    }
+    @keyframes strobeBlink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0.1; }
+    }
+
+    /* HUD Departure Card */
+    .flight-hud {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 32px 36px;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(26, 86, 219, 0.25);
+      color: #fff;
+      max-width: 480px;
+      width: 90%;
+      transform: translateY(20px) scale(0.95);
+      opacity: 0;
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
+    }
+    #flight-overlay.active .flight-hud {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+    .flight-hud-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 5px 14px;
+      border-radius: 100px;
+      margin-bottom: 16px;
+    }
+    .flight-hud-title {
+      font-family: var(--fd);
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #ffffff 30%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .flight-hud-route {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 20px 0;
+      padding: 14px 20px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .flight-route-point strong {
+      display: block;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      color: #fff;
+    }
+    .flight-route-point span {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+    .flight-route-line {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .flight-route-line::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 2px;
+      background: repeating-linear-gradient(90deg, rgba(56, 189, 248, 0.6) 0, rgba(56, 189, 248, 0.6) 6px, transparent 6px, transparent 12px);
+    }
+    .flight-route-plane {
+      font-size: 18px;
+      color: #38bdf8;
+      position: relative;
+      z-index: 2;
+      animation: planePulse 1.5s ease-in-out infinite;
+    }
+    @keyframes planePulse {
+      0%, 100% { transform: translateX(-6px); }
+      50% { transform: translateX(6px); }
+    }
+    .flight-hud-desc {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.75);
+      line-height: 1.5;
+    }
+
+    /* Whiteout Flash Flare for Seamless Transition */
+    .flight-flash-flare {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, #ffffff 0%, #dbeafe 60%, #93c5fd 100%);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 20;
+    }
+    #flight-overlay.active .flight-flash-flare {
+      animation: whiteoutFlare 0.8s ease-in 2.0s forwards;
+    }
+    @keyframes whiteoutFlare {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    @media (max-width: 580px) {
+      #flight-pill {
+        left: 12px;
+        right: 12px;
+        bottom: 16px;
+        max-width: none;
+        gap: 8px;
+        padding: 8px 12px;
+      }
+      .flight-pill-text {
+        font-size: 12px;
+      }
+      .flight-pill-btn {
+        padding: 5px 10px;
+        font-size: 11px;
+      }
+      #wa {
+        bottom: 78px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -754,6 +1237,136 @@
   <span class="wat">Chat on WhatsApp</span>
 </a>
 
+<!-- Live Departure Countdown Widget -->
+<div id="flight-pill" role="status" aria-live="polite">
+  <div class="flight-pill-radar">
+    <span class="flight-pill-icon" aria-hidden="true">&#9992;</span>
+  </div>
+  <div class="flight-pill-text">
+    Departure in <strong id="flight-countdown">15</strong>s &bull; Next-Gen Portal
+  </div>
+  <button type="button" class="flight-pill-btn" id="flight-fly-now">
+    <span>Fly Now</span> <span>&rarr;</span>
+  </button>
+  <button type="button" class="flight-pill-close" id="flight-pill-close" title="Stay on this page" aria-label="Dismiss countdown">&times;</button>
+  <div class="flight-pill-progress">
+    <div class="flight-pill-bar"></div>
+  </div>
+</div>
+
+<!-- Aeroplane Takeoff Transition Overlay -->
+<div id="flight-overlay" aria-hidden="true">
+  <!-- Speed warp lines -->
+  <div class="flight-warp-lines"></div>
+
+  <!-- Passing atmospheric clouds -->
+  <div class="flight-cloud flight-cloud-1"></div>
+  <div class="flight-cloud flight-cloud-2"></div>
+
+  <!-- Sonic Shockwave -->
+  <div class="flight-shockwave"></div>
+
+  <!-- Central HUD Departure Card -->
+  <div class="flight-hud">
+    <div class="flight-hud-tag">
+      <span class="dot" style="background:#38bdf8"></span> FLIGHT GDS-2026 DEPARTURE
+    </div>
+    <h2 class="flight-hud-title">Soaring to Next-Gen Platform</h2>
+    <div class="flight-hud-route">
+      <div class="flight-route-point">
+        <strong>DAC</strong>
+        <span>Dhaka</span>
+      </div>
+      <div class="flight-route-line">
+        <span class="flight-route-plane">&#9992;</span>
+      </div>
+      <div class="flight-route-point">
+        <strong>LIVE</strong>
+        <span>GDS Portal</span>
+      </div>
+    </div>
+    <p class="flight-hud-desc">Transitioning smoothly to <strong>https://gds-training.vercel.app/</strong> &hellip;</p>
+  </div>
+
+  <!-- Airplane Flight Motion Scene -->
+  <div class="flight-scene">
+    <div class="flight-airplane-wrapper">
+      <!-- Engine Contrail Trails -->
+      <div class="flight-contrail flight-contrail-left"></div>
+      <div class="flight-contrail flight-contrail-right"></div>
+
+      <!-- Engine Thrust Plumes -->
+      <div class="jet-thrust thrust-l"></div>
+      <div class="jet-thrust thrust-r"></div>
+
+      <!-- Wing Navigation Strobes -->
+      <div class="strobe-red"></div>
+      <div class="strobe-green"></div>
+
+      <!-- High-detail Vector Airplane -->
+      <svg viewBox="0 0 512 512" class="flight-airplane-svg" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="fuselageGrad" x1="160" y1="100" x2="350" y2="400" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="50%" stop-color="#e2e8f0"/>
+            <stop offset="100%" stop-color="#cbd5e1"/>
+          </linearGradient>
+          <linearGradient id="wingGrad" x1="100" y1="180" x2="400" y2="340" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#f8fafc"/>
+            <stop offset="60%" stop-color="#cbd5e1"/>
+            <stop offset="100%" stop-color="#94a3b8"/>
+          </linearGradient>
+          <linearGradient id="accentGrad" x1="200" y1="200" x2="320" y2="300" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#1a56db"/>
+            <stop offset="100%" stop-color="#0284c7"/>
+          </linearGradient>
+          <linearGradient id="glassGrad" x1="235" y1="140" x2="275" y2="170" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#38bdf8"/>
+            <stop offset="100%" stop-color="#0369a1"/>
+          </linearGradient>
+        </defs>
+
+        <g>
+          <!-- Wings -->
+          <path d="M256 220 L470 300 C480 304 478 314 466 312 L300 270 L256 260 L212 270 L46 312 C34 314 32 304 42 300 Z" fill="url(#wingGrad)"/>
+          <!-- Wing Blue Accents -->
+          <path d="M440 292 L470 300 C478 303 476 312 466 312 L430 304 Z" fill="url(#accentGrad)"/>
+          <path d="M72 292 L42 300 C34 303 36 312 46 312 L82 304 Z" fill="url(#accentGrad)"/>
+
+          <!-- Engines -->
+          <!-- Left Engine -->
+          <rect x="156" y="240" width="28" height="60" rx="14" fill="#64748b"/>
+          <ellipse cx="170" cy="242" rx="12" ry="6" fill="#334155"/>
+          <rect x="160" y="246" width="20" height="48" rx="10" fill="#cbd5e1"/>
+          <!-- Right Engine -->
+          <rect x="328" y="240" width="28" height="60" rx="14" fill="#64748b"/>
+          <ellipse cx="342" cy="242" rx="12" ry="6" fill="#334155"/>
+          <rect x="332" y="246" width="20" height="48" rx="10" fill="#cbd5e1"/>
+
+          <!-- Horizontal Stabilizer Tail Wings -->
+          <path d="M256 420 L350 460 C356 463 354 468 346 467 L276 448 L256 445 L236 448 L166 467 C158 468 156 463 162 460 Z" fill="url(#wingGrad)"/>
+
+          <!-- Main Fuselage Body -->
+          <path d="M256 60 C242 110 232 170 232 280 C232 380 240 450 256 480 C272 450 280 380 280 280 C280 170 270 110 256 60 Z" fill="url(#fuselageGrad)"/>
+
+          <!-- Livery Stripe -->
+          <path d="M256 120 C246 160 240 220 240 290 C240 370 246 430 256 460 C266 430 272 370 272 290 C272 220 266 160 256 120 Z" fill="url(#accentGrad)" opacity="0.9"/>
+
+          <!-- Cockpit Windshield -->
+          <path d="M256 95 C246 102 242 112 240 118 C248 116 254 116 256 116 C258 116 264 116 272 118 C270 112 266 102 256 95 Z" fill="url(#glassGrad)"/>
+          
+          <!-- Vertical Fin (Tail) -->
+          <path d="M254 390 L258 390 L260 460 L252 460 Z" fill="#0284c7"/>
+          <ellipse cx="256" cy="460" rx="3" ry="2" fill="#ffffff"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Daylight Sky / Whiteout Flash for Seamless Destination Navigation -->
+  <div class="flight-flash-flare"></div>
+</div>
+
 <script>
 // FAQ accordion — toggle on static HTML already in DOM
 document.querySelectorAll('.fq').forEach(function(btn){
@@ -780,6 +1393,72 @@ document.getElementById('cf').addEventListener('submit',function(e){
   var b=document.getElementById('sb');b.textContent='Sending...';b.disabled=true;
   setTimeout(function(){document.getElementById('fok').classList.add('show');b.textContent='Sent!';},1200);
 });
+
+// 15-Second Aeroplane Flight Transition & Smooth Redirect
+(function() {
+  var TARGET_URL = 'https://gds-training.vercel.app/';
+  var DURATION = 15;
+  var remaining = DURATION;
+  var timerInterval = null;
+  var isTransitioning = false;
+
+  var pill = document.getElementById('flight-pill');
+  var countdownEl = document.getElementById('flight-countdown');
+  var overlay = document.getElementById('flight-overlay');
+  var flyNowBtn = document.getElementById('flight-fly-now');
+  var closeBtn = document.getElementById('flight-pill-close');
+
+  function triggerTransition() {
+    if (isTransitioning) return;
+    isTransitioning = true;
+    if (timerInterval) clearInterval(timerInterval);
+    if (pill) pill.classList.add('hidden');
+
+    if (overlay) {
+      overlay.classList.add('active');
+    }
+
+    // After animation sonic climb and whiteout flare, smoothly redirect
+    setTimeout(function() {
+      window.location.href = TARGET_URL;
+    }, 2400);
+  }
+
+  function startTimer() {
+    timerInterval = setInterval(function() {
+      remaining--;
+      if (countdownEl) {
+        countdownEl.textContent = remaining;
+      }
+      if (remaining <= 0) {
+        clearInterval(timerInterval);
+        triggerTransition();
+      }
+    }, 1000);
+  }
+
+  if (flyNowBtn) {
+    flyNowBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      triggerTransition();
+    });
+  }
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (timerInterval) clearInterval(timerInterval);
+      if (pill) pill.classList.add('hidden');
+    });
+  }
+
+  // Start the 15s timer when page loads
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startTimer);
+  } else {
+    startTimer();
+  }
+})();
 </script>
 </body>
 </html>
